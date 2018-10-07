@@ -1,0 +1,186 @@
+﻿@model  SiteOficial.Models.Votacao
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("GerarGRaficoBarra")',
+                    data: {},
+                    success: function (data) {
+                        console.log(data)
+                        chartData = data
+                        drawChart(chartData)
+                    },
+                    error: function () {
+                        alert("erro");
+                    }
+
+                });
+            });
+
+
+  google.charts.load("current", {packages:['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Element'); // Implicit domain label col.
+        data.addColumn('number', 'Nymeros'); // Implicit series 1 data col.
+        data.addColumn({type:'string', role:'style'});  // interval role col.
+        data.addRows(chartData);
+
+        var view = new google.visualization.DataView(data);
+        view.setColumns([0, 1,
+                         { calc: "stringify",
+                             sourceColumn: 1,
+                             type: "string",
+                             role: "annotation" },
+                         2]);
+
+        var options = {
+            title: "Avaliações",
+            width: 600,
+            height: 400,
+            bar: {groupWidth: "95%"},
+            legend: { position: "none" },
+
+        };
+        var chart = new google.visualization.ColumnChart(document.getElementById("columnchart_values"));
+        chart.draw(view, options);
+    }
+
+            function Salvar() {
+                $('#Fecha').click();
+                document.body.className = "loading";
+                var form = $("#formVotacao");
+
+                var endereco = form.attr("action");
+                var postData = form.serialize();
+
+                $.post(endereco, postData)
+                    .done(function (data) {
+                        if (data.Sucesso) {
+                            document.body.className = "";
+                        }
+                        else {
+                            document.body.className = "";
+                        }
+                    });
+            }
+
+            @*$(document).ready(function () {
+                document.body.className = "loading";
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("GerarGRafico")',
+                    data: {},
+                    success: function (data) {
+                        console.log(data)
+                        chartData = data
+                        drawChart(chartData)
+                    },
+                    error: function () {
+                        alert("erro");
+                    }
+
+                });
+                document.body.className = "";
+
+                // Load the Visualization API and the corechart package.
+                // Load the Visualization API and the corechart package.
+                google.charts.load('current', { 'packages': ['corechart'] });
+
+                // Set a callback to run when the Google Visualization API is loaded.
+                google.charts.setOnLoadCallback(drawChart);
+
+                // Callback that creates and populates a data table,
+                // instantiates the pie chart, passes in the data and
+                // draws it.
+                function drawChart() {
+
+                    // Create the data table.
+                    var data = google.visualization.arrayToDataTable(chartData);
+                    var options = {
+                        'title': 'Votação',
+                        'width': 500,
+                        'height': 500,
+                        'colors': ['#006400', '#FF0000', '#A020F0', '#f3b49f', '#f6c7b6']
+                    };
+
+                    var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+                    chart.draw(data, options);
+                };
+            });*@
+    </script>
+</head>
+<body>
+
+        <div class="loading-bar"></div>
+
+        <div class="container">
+            <div id="DefinirVotacao">
+                <h2>AVALIE O SITE</h2>
+                <!-- Trigger the modal with a button -->
+                <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" id="Abrir">Vote</button>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="myModal" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Formulário</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form action="@Url.Action("Salvar")" method="post" id="formAutores">
+
+                                <input type="hidden" name="Id" value="" />
+
+                                <p>
+                                    <label>Nome:</label>
+                                    <input type="text" class="form-control" name="Nome" value="">
+                                </p>
+                                <p>
+                                    <label>Idade:</label>
+                                    <input type="text" class="form-control" name="Idade" value="">
+                                </p>
+                                <p>
+                                    <label>Avaliação</label>
+                                    @Html.DropDownListFor(Model => Model.Voto, new SelectList(
+                                    new List<Object>{
+                                    new { value = 0 , text = "Ótimo"  },
+                                    new { value = 1 , text = "Bom" },
+                                    new { value = 2 , text = "Regular"},
+                                    new { value = 3 , text = "Ruim"}
+                                       },
+                                     "value",
+                                     "text"
+                                               ), "Selecione", new { @class = "form-control" })
+                                </p>
+                                <button class="btn btn-info btn-lg" onclick="Salvar();">Enviar</button>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" id="Fecha" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    <div id="chart_div"></div>
+
+    <div id="columnchart_values" style="width: 900px; height: 300px;"></div>
+
+</body>
+</html>
