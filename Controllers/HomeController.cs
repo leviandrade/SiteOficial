@@ -18,7 +18,7 @@ namespace SiteOficial.Controllers
 
         private List<Models.Votacao> CriarListaVotos()
         {
-            string stringConexao = @"Data Source=DESKTOP-DL249A7\SQLSERVER14;Initial Catalog=SiteOficial;user Id=sa;Password=24052716";
+            string stringConexao = @"Data Source=den1.mssql6.gear.host;Initial Catalog=avaliacao;user Id=avaliacao;Password=Uc3~!e0bw2e3";
             string sql = "Select id,Nome,Idade,Voto from Votacao";
             List<Models.Votacao> lista = new List<Models.Votacao>();
             using (var conn = new SqlConnection(stringConexao))
@@ -57,8 +57,7 @@ namespace SiteOficial.Controllers
 
         public ActionResult Salvar(Models.Votacao entidade)
         {
-            string stringConexao = @"Data Source=DESKTOP-DL249A7\SQLSERVER14;Initial Catalog=SiteOficial;user Id=sa;Password=24052716";
-            using (var conn = new SqlConnection(stringConexao))
+            string stringConexao = @"Data Source=den1.mssql6.gear.host;Initial Catalog=avaliacao;user Id=avaliacao;Password=Uc3~!e0bw2e3";            using (var conn = new SqlConnection(stringConexao))
             {
                 var lista = CriarListaVotos();
                 var listaExistente = lista.Where(x => x.Nome == entidade.Nome);
